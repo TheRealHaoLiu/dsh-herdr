@@ -1,4 +1,5 @@
 import type { Context } from "@deepseek-ai/cordis";
+import { randomUUID } from "node:crypto";
 import type {} from "@deepseek-ai/dsh-agent";
 import type { Agent } from "@deepseek-ai/dsh-agent";
 import type { Session, SessionEvent } from "@deepseek-ai/dsh-session";
@@ -31,6 +32,15 @@ export interface HerdrPluginConfig {
 const SOURCE = "dsh-herdr";
 const LABEL = "dsh";
 
+/** Cordis function-plugin metadata. */
+export const name = "dsh-herdr";
+export const inject = ["agents"] as const;
+
+/** Avoid Herdr sequence collisions when a pane launches multiple DSH processes. */
+export function instanceSource(base: string, instanceId: string): string {
+  return `${base}:${instanceId}`;
+}
+
 /**
  * Cordis plugin entry point. It is a complete silent no-op unless it runs in a
  * Herdr pane with all three required variables: HERDR_ENV=1, HERDR_PANE_ID,
@@ -45,7 +55,7 @@ export function apply(ctx: Context, config: HerdrPluginConfig = {}): void {
   const reporter = new HerdrReporter({
     paneId,
     binPath,
-    source: config.source ?? SOURCE,
+    source: instanceSource(config.source ?? SOURCE, randomUUID()),
     agentLabel: config.agentLabel ?? LABEL,
     runner: config.runner,
   });
@@ -63,5 +73,3 @@ export function apply(ctx: Context, config: HerdrPluginConfig = {}): void {
   });
   ctx.effect(() => () => bridge.dispose(), "dsh-herdr release");
 }
-
-export default apply;

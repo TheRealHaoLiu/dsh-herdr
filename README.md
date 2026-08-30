@@ -4,13 +4,13 @@
 
 ## Install
 
-Install this package beside the DSH host that composes it:
+Install this package into a DSH profile:
 
 ```sh
-pnpm add dsh-herdr
+dsh plugin --profile <name> add dsh-herdr
 ```
 
-The host must already provide the peer dependencies `@deepseek-ai/cordis`, `@deepseek-ai/dsh-agent`, and `@deepseek-ai/dsh-session`.
+Its bundle layer activates the plugin automatically. The host must already provide the peer dependencies `@deepseek-ai/cordis`, `@deepseek-ai/dsh-agent`, and `@deepseek-ai/dsh-session`.
 
 ## Compose
 
@@ -32,7 +32,7 @@ HERDR_BIN_PATH=<absolute path to herdr>
 
 Otherwise it registers nothing, starts no process, and produces no logging. This makes ordinary terminals, tests, and headless DSH runs clean no-ops.
 
-`source` and `agentLabel` may be customized when composing if another integration needs a distinct Herdr identity:
+`source` and `agentLabel` may be customized when composing if another integration needs a distinct Herdr identity. A unique instance ID is appended to the source automatically so consecutive DSH processes in one pane cannot collide on Herdr sequence numbers:
 
 ```ts
 await ctx.plugin(herdr, { source: "my-dsh-host", agentLabel: "deepseek" });

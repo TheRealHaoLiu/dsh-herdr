@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { apply, type HerdrPluginConfig } from "../src/index.js";
+import {
+  apply,
+  inject,
+  instanceSource,
+  name,
+  type HerdrPluginConfig,
+} from "../src/index.js";
 
 type Listener = (...args: never[]) => void;
 
@@ -16,6 +22,17 @@ function context() {
 }
 
 describe("apply", () => {
+  it("declares the Cordis agent-service dependency", () => {
+    expect(name).toBe("dsh-herdr");
+    expect(inject).toEqual(["agents"]);
+  });
+
+  it("scopes report sources to one plugin instance", () => {
+    expect(instanceSource("dsh-herdr", "instance-1234")).toBe(
+      "dsh-herdr:instance-1234",
+    );
+  });
+
   it.each<HerdrPluginConfig["env"]>([
     {},
     { HERDR_ENV: "0", HERDR_PANE_ID: "p", HERDR_BIN_PATH: "herdr" },
